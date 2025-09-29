@@ -2,11 +2,12 @@ name: KeepAlive (Windows)
 
 on:
   schedule:
-    - cron: '0 2 * * *'   # chạy hàng ngày 02:00 UTC
+    # chạy hàng ngày 02:00 UTC (9h sáng VN)
+    - cron: '0 2 * * *'
   workflow_dispatch: {}
 
 jobs:
-  keepalive-windows:
+  keepalive:
     runs-on: windows-latest
 
     steps:
@@ -41,7 +42,8 @@ jobs:
           $Env:RCLONE_CONF | Out-File -FilePath $confPath -Encoding utf8
           Write-Host "Wrote rclone.conf to $confPath"
 
-      - name: Run KeepAlive Script
+      - name: Run KeepAlive Script (App Mode)
+        continue-on-error: true
         env:
           TENANT_ID: ${{ secrets.TENANT_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -57,3 +59,28 @@ jobs:
           EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
         run: |
           python KeepAlive_Combined_Windows.py --app --skip-rclone
+
+      - name: Run KeepAlive Script (User Mode)
+        continue-on-error: true
+        env:
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+          IMAGE_FOLDER: ${{ secrets.IMAGE_FOLDER }}
+          RCLONE_REMOTE: ${{ secrets.RCLONE_REMOTE }}
+          RCLONE_CLEAN_FOLDER: ${{ secrets.RCLONE_CLEAN_FOLDER }}
+          LOCAL_UPLOAD: ${{ secrets.LOCAL_UPLOAD }}
+          REMOTE_UPLOAD: ${{ secrets.REMOTE_UPLOAD }}
+          EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
+        run: |
+          python KeepAlive_Combined_Windows.py --user --skip-rclone
+
+      - name: Upload ping_log.txt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ping-log
+          path: ping_log.txt
