@@ -1,18 +1,17 @@
-name: KeepAlive E5 Dev
+name: KeepAlive (Windows)
 
 on:
   schedule:
-    # chạy mỗi ngày 9h sáng UTC (16h VN)
-    - cron: "0 2 * * *"
-  workflow_dispatch: # cho phép chạy thủ công
+    # ví dụ: chạy hàng ngày 02:00 UTC (tùy bạn). Cron tính theo UTC.
+    - cron: '0 2 * * *'
+  workflow_dispatch: {}
 
 jobs:
-  run-keepalive:
-    runs-on: ubuntu-latest
-
+  keepalive-windows:
+    runs-on: windows-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -24,7 +23,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests python-dotenv feedparser flask
 
-      - name: Run KeepAlive Script
+      - name: Write rclone.conf (if provided)
+        if: ${{ secrets.RCLONE_CONF != '' }}
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        shell: pwsh
+        run: |
+          $cfg = $Env:RCLONE_CONF
+          if (-not $cfg) { Write-Host "No RCLONE_CONF secret set. Skipping." ; exit 0 }
+          $rcloneDir = Join-Path $env:APPDATA "rclone"
+          New-Item -ItemType Directory -Path $rcloneDir -Force | Out-Null
+          $confPath = Join-Path $rcloneDir "rclone.conf"
+          $cfg | Out-File -FilePath $confPath -Encoding utf8
+          Write-Host "Wrote rclone.conf to $confPath"
+
+      - name: Run KeepAlive (App mode)
         env:
           TENANT_ID: ${{ secrets.TENANT_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -39,4 +52,5 @@ jobs:
           REMOTE_UPLOAD: ${{ secrets.REMOTE_UPLOAD }}
           EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
         run: |
-          python KeepAlive_Combined_Windows.py --app
+          # nếu bạn không dùng rclone (hoặc rclone chưa config), thêm --skip-rclone
+          python KeepAlive_Combined_Windows.py --app --skip-rclone
