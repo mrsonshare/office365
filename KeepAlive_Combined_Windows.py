@@ -6,6 +6,12 @@ Phiên bản Windows: fix rclone, giữ Admin tasks, thêm gửi mail Copilot ra
 """
 
 import os, sys, json, random, argparse, requests, feedparser, logging
+
+# --- Fix UnicodeEncodeError on Windows logging ---
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from flask import Flask, redirect, request
