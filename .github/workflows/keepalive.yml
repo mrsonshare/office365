@@ -3,7 +3,7 @@ name: KeepAlive E5 Dev
 on:
   schedule:
     # chạy mỗi ngày 9h sáng UTC (16h VN)
-    - cron: "0 9 * * *"
+    - cron: "0 2 * * *"
   workflow_dispatch: # cho phép chạy thủ công
 
 jobs:
