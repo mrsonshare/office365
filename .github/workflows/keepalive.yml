@@ -2,8 +2,7 @@ name: KeepAlive (Windows)
 
 on:
   schedule:
-    # ví dụ: chạy hàng ngày 02:00 UTC (tức 9h sáng VN)
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * *'   # chạy hàng ngày 02:00 UTC
   workflow_dispatch: {}
 
 jobs:
@@ -27,12 +26,15 @@ jobs:
       - name: Install rclone (chocolatey)
         run: choco install rclone -y
 
-      - name: Write rclone.conf (if provided)
-        if: ${{ secrets.RCLONE_CONF }}
+      - name: Write rclone.conf (optional)
         env:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
         shell: pwsh
         run: |
+          if (-not $Env:RCLONE_CONF) {
+            Write-Host "No RCLONE_CONF secret set. Skipping..."
+            exit 0
+          }
           $rcloneDir = Join-Path $env:APPDATA "rclone"
           New-Item -ItemType Directory -Path $rcloneDir -Force | Out-Null
           $confPath = Join-Path $rcloneDir "rclone.conf"
@@ -54,4 +56,4 @@ jobs:
           REMOTE_UPLOAD: ${{ secrets.REMOTE_UPLOAD }}
           EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
         run: |
-          python KeepAlive_Combined_Windows.py --app
+          python KeepAlive_Combined_Windows.py --app --skip-rclone
