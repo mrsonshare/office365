@@ -1,0 +1,13 @@
+# Bỏ file log
+ping_log.txt
+
+# Bỏ thư mục python nếu không phải mã nguồn
+python/
+
+# Bỏ secrets
+.env
+token.json
+
+# Bỏ thư mục ảnh (nếu chỉ để local test)
+images/
+
