@@ -54,4 +54,4 @@ jobs:
           REMOTE_UPLOAD: ${{ secrets.REMOTE_UPLOAD }}
           EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
         run: |
-          python KeepAlive_Combined_Windows.py --app --skip-rclone
+          python KeepAlive_Combined_Windows.py --app
