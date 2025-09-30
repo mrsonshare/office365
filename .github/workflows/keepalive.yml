@@ -53,4 +53,4 @@ jobs:
           EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
         run: |
           # nếu bạn không dùng rclone (hoặc rclone chưa config), thêm --skip-rclone
-          python KeepAlive_Combined_Windows.py --app --skip-rclone
+          python KeepAlive_Combined_Windows.py --app
