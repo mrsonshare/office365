@@ -17,12 +17,20 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, request
 
 # ------------------ Logging ------------------
-LOG_FILE = "ping_log.txt"
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s: %(message)s",
-    handlers=[logging.FileHandler(LOG_FILE, encoding="utf-8"), logging.StreamHandler(sys.stdout)]
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[logging.StreamHandler(sys.stdout)]
 )
+
+# Ép logger dùng UTF-8, nếu ký tự không encode được thì thay bằng '?'
+try:
+    logging.getLogger().handlers[0].stream.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+# -------------------------------------------------
+
 def log(msg, level="info"):
     getattr(logging, level)(msg)
 
