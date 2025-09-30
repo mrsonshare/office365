@@ -2,8 +2,8 @@ name: KeepAlive
 
 on:
   schedule:
-    # ví dụ: chạy hàng ngày 02:00 UTC (tùy bạn). Cron tính theo UTC.
-    - cron: '0 2 * * *'
+    # chạy lúc 00:00 UTC mỗi 3 ngày một lần
+    - cron: '0 2 */3 * *'
   workflow_dispatch: {}
 
 jobs:
