@@ -6,31 +6,17 @@ Phiên bản Windows: fix rclone, giữ Admin tasks, thêm gửi mail Copilot ra
 """
 
 import os, sys, json, random, argparse, requests, feedparser, logging
-
-# --- Fix UnicodeEncodeError on Windows logging ---
-import io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from flask import Flask, redirect, request
 
 # ------------------ Logging ------------------
+LOG_FILE = "ping_log.txt"
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.FileHandler(LOG_FILE, encoding="utf-8"), logging.StreamHandler(sys.stdout)]
 )
-
-# Ép logger dùng UTF-8, nếu ký tự không encode được thì thay bằng '?'
-try:
-    logging.getLogger().handlers[0].stream.reconfigure(encoding="utf-8", errors="replace")
-except Exception:
-    pass
-# -------------------------------------------------
-
 def log(msg, level="info"):
     getattr(logging, level)(msg)
 
@@ -42,7 +28,7 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 USER_EMAIL = os.getenv("USER_EMAIL")
 REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8000/callback")
-IMAGE_FOLDER = os.getenv("IMAGE_FOLDER", "C:\office365E5\images")
+IMAGE_FOLDER = os.getenv("IMAGE_FOLDER", "C:\\e5-images")
 RCLONE_REMOTE = os.getenv("RCLONE_REMOTE", "onedrive")
 RCLONE_CLEAN_FOLDER = os.getenv("RCLONE_CLEAN_FOLDER", "KeepAliveClean")
 LOCAL_UPLOAD = os.getenv("LOCAL_UPLOAD", "upload_local")
