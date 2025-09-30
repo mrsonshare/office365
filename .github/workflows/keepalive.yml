@@ -2,7 +2,6 @@ name: KeepAlive (Windows)
 
 on:
   schedule:
-    # chạy hàng ngày 02:00 UTC (9h sáng VN)
     - cron: '0 2 * * *'
   workflow_dispatch: {}
 
@@ -42,6 +41,12 @@ jobs:
           $Env:RCLONE_CONF | Out-File -FilePath $confPath -Encoding utf8
           Write-Host "Wrote rclone.conf to $confPath"
 
+      - name: Enable UTF-8
+        shell: pwsh
+        run: |
+          chcp 65001
+          $env:PYTHONUTF8=1
+
       - name: Run KeepAlive Script (App Mode)
         continue-on-error: true
         env:
@@ -62,7 +67,6 @@ jobs:
 
       - name: Run KeepAlive Script (User Mode)
         continue-on-error: true
-        shell: pwsh
         env:
           TENANT_ID: ${{ secrets.TENANT_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -77,7 +81,6 @@ jobs:
           REMOTE_UPLOAD: ${{ secrets.REMOTE_UPLOAD }}
           EXTERNAL_EMAILS: ${{ secrets.EXTERNAL_EMAILS }}
         run: |
-          $env:PYTHONUTF8=1
           python KeepAlive_Combined_Windows.py --user --skip-rclone
 
       - name: Upload ping_log.txt
