@@ -1,4 +1,4 @@
-name: KeepAlive (Windows)
+name: KeepAlive
 
 on:
   schedule:
@@ -24,7 +24,7 @@ jobs:
           pip install requests python-dotenv feedparser flask
 
       - name: Write rclone.conf (if provided)
-        if: ${{ secrets.RCLONE_CONF != '' }}
+        if: ${{ secrets.RCLONE_CONF }}
         env:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
         shell: pwsh
